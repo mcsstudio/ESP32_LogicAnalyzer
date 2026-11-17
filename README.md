@@ -1,109 +1,110 @@
 # ESP32 LogicAnalyzer
 
-![Status](https://img.shields.io/badge/Status-In%20Development-yellow)
-![License](https://img.shields.io/badge/License-GPL%203.0-blue)
+![Trạng thái](https://img.shields.io/badge/Status-In%20Development-yellow)
+![Giấy phép](https://img.shields.io/badge/License-GPL%203.0-blue)
 
-A [SUMP](http://dangerousprototypes.com/docs/The_Logic_Sniffer%27s_extended_SUMP_protocol) compatible 16Bit Logic Analyzer for ESP32 MCUs.
+Bộ phân tích logic 16 bit tương thích với [SUMP](http://dangerousprototypes.com/docs/The_Logic_Sniffer%27s_extended_SUMP_protocol), dành cho ESP32.
 
 <img src="/docs/images/ESP32_LogicAnalyzer_in_PulseView.png" alt="PulseView" style="width: 80%;" />
 
-## Specifications
+## Thông số kỹ thuật
 
-- Uses **ESP32 I2S DMA** and can capture speeds up to **20 MHz**.
-- Supports **8-bit** and **16-bit** operations.
-- Maximum **128k** samples (even in 8-bit capturing mode).
-- RLE compression supported.
-- Default OLS port is **UART0** with a default baud rate of **912600**.
-- You can configure UART ports and high-speed baud rates for OLS communication by editing the definitions in LogicAnalyzerConfig.h.
+- Sử dụng **I2S DMA của ESP32** và có thể thu thập dữ liệu ở tốc độ lên đến **20 MHz**.
+- Hỗ trợ chế độ hoạt động **8 bit** và **16 bit**.
+- Tối đa **128k** mẫu (kể cả khi thu thập ở chế độ 8 bit).
+- Hỗ trợ nén RLE.
+- Cổng OLS mặc định là **UART0**, với tốc độ baud mặc định là **912600**.
+- Bạn có thể cấu hình các cổng UART và tốc độ baud cao cho giao tiếp OLS bằng cách chỉnh sửa các định nghĩa trong `LogicAnalyzerConfig.h`.
 
-### Supported Environments
+### Môi trường được hỗ trợ
 
-| Environment    | Status | Details                                 |
-|----------------|--------|-----------------------------------------|
-| PlatformIO     | ✅     | Tested with `platform-espressif32@6.11.0` |
-| Arduino IDE    | ✅     | Tested with `Arduino-ESP32 core 3.3.7` |
+| Môi trường   | Trạng thái | Chi tiết                                      |
+|--------------|------------|-----------------------------------------------|
+| PlatformIO   | ✅         | Đã kiểm thử với `platform-espressif32@6.11.0` |
+| Arduino IDE  | ✅         | Đã kiểm thử với `Arduino-ESP32 core 3.3.7`    |
 
-### Under Development
+### Đang phát triển
 
-- WROOVER modules support **2M** samples but only up to **2 MHz** due to bandwidth limits on PSRAM access.
-- Analog input support.
+- Các mô-đun WROOVER hỗ trợ **2M** mẫu nhưng chỉ đạt tối đa **2 MHz** do giới hạn băng thông khi truy cập PSRAM.
+- Hỗ trợ đầu vào analog.
 
-## Quick Start Guide
+## Hướng dẫn bắt đầu nhanh
 
-### Environments
+### Môi trường
 
 #### PlatformIO
 
-1. Install [PlatformIO](https://platformio.org/) in VS Code.
-2. Open the project folder in PlatformIO.
-3. Build the project and flash it to your ESP32.
+1. Cài đặt [PlatformIO](https://platformio.org/) trong VS Code.
+2. Mở thư mục dự án trong PlatformIO.
+3. Biên dịch dự án và nạp chương trình vào ESP32.
 
 #### Arduino IDE
 
-1. Install the **ESP32 board support** via the Boards Manager (`esp32 by Espressif Systems`).
-2. Open the sketch in `ESP32_LogicAnalyzer/ESP32_LogicAnalyzer.ino`.
-3. Select the board you're using (e.g. `ESP32 Dev Module`).
-4. Use ESP32 Arduino core version `3.3.7`.
-5. Click **Upload**.
+1. Cài đặt **hỗ trợ bo mạch ESP32** thông qua Boards Manager (`esp32 by Espressif Systems`).
+2. Mở sketch tại `ESP32_LogicAnalyzer/ESP32_LogicAnalyzer.ino`.
+3. Chọn bo mạch bạn đang sử dụng (ví dụ: `ESP32 Dev Module`).
+4. Sử dụng phiên bản ESP32 Arduino core `3.3.7`.
+5. Nhấn **Upload**.
 
-**Important:** If you're using UART0 for OLS communication, set **Core Debug Level = None** in the Arduino IDE before compiling, especially for captures above 10 MHz.
+**Quan trọng:** Nếu dùng UART0 để giao tiếp OLS, hãy đặt **Core Debug Level = None** trong Arduino IDE trước khi biên dịch, đặc biệt khi thu thập dữ liệu ở tốc độ trên 10 MHz.
 
 ### PulseView
 
-Open PulseView with:
+Mở PulseView bằng lệnh:
 ```bash
 pulseview -D -d ols:conn=/dev/ttyUSB0::serialcomm=921600/8n1
 ```
-Or from the GUI, connect the device and select **Openbench Logic Sniffer & SUMP compatibles (ols)**.
+Hoặc kết nối thiết bị từ giao diện đồ họa và chọn **Openbench Logic Sniffer & SUMP compatibles (ols)**.
 
 ![PulseView](/docs/images/connect_to_device_pulseview.png)
 
-RLE can be enabled in Device configuration dialog:
+Có thể bật RLE trong hộp thoại cấu hình thiết bị:
 
 ![RLE](/docs/images/RLE_enable.png)
 
-For more details, see the [PulseView documentation](https://sigrok.org/wiki/PulseView).
+Để biết thêm chi tiết, xem [tài liệu PulseView](https://sigrok.org/wiki/PulseView).
 
-## Connections
+## Kết nối
 
-| Pin      | Connection                              |
-|----------|-----------------------------------------|
-| clk_in   | GPIO23 (connect to **clk_out**)         |
-| clk_out  | GPIO22 (connect to **clk_in**)          |
-| Ground   | Connect the target device's GND to the ESP32 GND         |
-| Channels | CH15 - CH0 (connect your signals here)  |
+| Chân     | Kết nối                                      |
+|----------|----------------------------------------------|
+| clk_in   | GPIO23 (kết nối với **clk_out**)             |
+| clk_out  | GPIO22 (kết nối với **clk_in**)              |
+| Ground   | Kết nối GND của thiết bị cần đo với GND ESP32 |
+| Channels | CH15 - CH0 (kết nối các tín hiệu tại đây)    |
 
-<img src="/docs/images/esp32_la_conn.png" alt="ESP32LA Connection" style="width: 50%;" />
+<img src="/docs/images/esp32_la_conn.png" alt="Kết nối ESP32LA" style="width: 50%;" />
 
-⚠️ **Warning:** GPIO23 is used for I2S input clock and GPIO22 for LEDC output clock.  
-Do not use these pins for general I/O. If needed, change them in the code and rewire accordingly.
+⚠️ **Cảnh báo:** GPIO23 được dùng làm xung clock đầu vào I2S và GPIO22 làm xung clock đầu ra LEDC.  
+Không sử dụng các chân này cho mục đích I/O thông thường. Nếu cần, hãy thay đổi chúng trong mã nguồn và đấu dây lại tương ứng.
 
-## Hardware Design (KiCad)
+## Thiết kế phần cứng (KiCad)
 
-This project includes a custom PCB designed in **KiCad 9** to connect the ESP32 DevKitC V1 with logic analyzer channels and level shifters.
+Dự án này bao gồm một PCB tùy chỉnh được thiết kế bằng **KiCad 9** để kết nối ESP32 DevKitC V1 với các kênh của bộ phân tích logic và các bộ chuyển mức logic.
 
-All hardware-related files are located in the [`hardware/`](./hardware) folder and include:
+Tất cả tệp liên quan đến phần cứng nằm trong thư mục [`hardware/`](./hardware), bao gồm:
 
-- Complete KiCad project (`.kicad_pro`, `.kicad_sch`, `.kicad_pcb`)
-- BOM (`BOM.xlsx`) and CPL (`CPL1.xlsx`) for assembly
-- Gerber files (`hardware/gerbers/`) for PCB fabrication
-- Optional UART2 debug port
-- Level shifter ICs (SN74LVC245A) for 5V input compatibility
+- Dự án KiCad hoàn chỉnh (`.kicad_pro`, `.kicad_sch`, `.kicad_pcb`)
+- BOM (`BOM.xlsx`) và CPL (`CPL1.xlsx`) phục vụ lắp ráp
+- Tệp Gerber (`hardware/gerbers/`) dùng để sản xuất PCB
+- Cổng debug UART2 tùy chọn
+- Các IC chuyển mức logic (SN74LVC245A) để tương thích với tín hiệu đầu vào 5V
 
-> ⚠️ The design is currently under validation. Use at your own risk until physical tests are completed.
+> ⚠️ Thiết kế hiện đang trong quá trình kiểm định. Hãy tự chịu rủi ro khi sử dụng cho đến khi hoàn tất kiểm thử thực tế.
 
-### PCB Preview
+### Hình ảnh PCB
 
-![3D View of PCB](./hardware/images/pcb_3d.png)
+![Hình ảnh 3D của PCB](./hardware/images/pcb_3d.png)
 
-## Attributions
+## Ghi nhận đóng góp
 
-This project is a fork of [ESP32_LogicAnalyzer](https://github.com/EUA/ESP32_LogicAnalyzer), created by [Erdem U. Altinyurt](https://github.com/EUA).
+Dự án này ban đầu do [Erdem U. Altinyurt](https://github.com/EUA) tạo ra.
+Việt hóa do [mcsstudio](https://github.com/mcsstudio) dịch thuật, có sử dụng AI.
 
-This project uses code from:
-- [esp32-cam-demo](https://github.com/igrr/esp32-cam-demo) for I2S DMA.
-- [Arduino Logic Analyzer](https://github.com/gillham/logic_analyzer) as a SUMP protocol "template".
+Dự án sử dụng mã nguồn từ:
+- [esp32-cam-demo](https://github.com/igrr/esp32-cam-demo) cho I2S DMA.
+- [Arduino Logic Analyzer](https://github.com/gillham/logic_analyzer) làm “khuôn mẫu” cho giao thức SUMP.
 
-## License
+## Giấy phép
 
-This project is licensed under the **GPL 3.0 License**. See the [LICENSE](LICENSE) file for details.
+Dự án này được cấp phép theo **GPL 3.0**. Xem tệp [LICENSE](LICENSE) để biết chi tiết.
