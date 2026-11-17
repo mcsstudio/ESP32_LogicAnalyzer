@@ -1,4 +1,3 @@
-
   /*************************************************************************
  * 
  *  ESP32 Logic Analyzer
@@ -20,10 +19,10 @@
  *
  *************************************************************************
  *
- *  This project steals some code from 
- *  https://github.com/igrr/esp32-cam-demo for I2S DMA
- *  and
- *  https://github.com/gillham/logic_analyzer/issues for SUMP protocol as template.
+ *  Dự án này sử dụng một phần mã nguồn từ:
+ *  https://github.com/igrr/esp32-cam-demo (dành cho I2S DMA)
+ *  và
+ *  https://github.com/gillham/logic_analyzer/issues (dùng làm mẫu cho giao thức SUMP).
  * 
  */ 
 #include "LogicAnalyzer.h"
@@ -36,7 +35,7 @@ void setup(void) {
 
 void loop()
 {
-  vTaskDelay(1); //To avoid WDT
+  vTaskDelay(1); // Tránh lỗi WDT (Watchdog Timer - Bộ đếm thời gian giám sát)
   
   if (OLS_Port.available() > 0) {
     int cmdByte = OLS_Port.read();
